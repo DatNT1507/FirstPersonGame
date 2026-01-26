@@ -1,0 +1,9 @@
+# Ignore build and temporary folders
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+*.sln
