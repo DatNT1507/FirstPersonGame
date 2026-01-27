@@ -1,9 +1,14 @@
-# Ignore build and temporary folders
-Binaries/
-Build/
+.idea/
+*.xml
+
 DerivedDataCache/
 Intermediate/
 Saved/
+Binaries/
+*.sln
+
 .vs/
-.vscode/
+*.suo
+*.user
+*.userosscache
 *.sln
