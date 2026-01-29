@@ -18,16 +18,8 @@ void AEnemy_Controller::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	// Start the Behavior Tree
 	if (BehaviourTree)
 	{
-		// Initialize the blackboard
-		if (BehaviourTree->BlackboardAsset)
-		{
-			Blackboard->InitializeBlackboard(*BehaviourTree->BlackboardAsset);
-		}
-		
 		RunBehaviorTree(BehaviourTree);
-		BehaviorTreeComponent->StartTree(*BehaviourTree);
 	}
 }
