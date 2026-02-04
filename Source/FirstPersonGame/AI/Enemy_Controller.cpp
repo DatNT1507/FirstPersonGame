@@ -4,6 +4,9 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "AI/EnemyKeys.h"
 
 AEnemy_Controller::AEnemy_Controller(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -12,6 +15,8 @@ AEnemy_Controller::AEnemy_Controller(FObjectInitializer const& ObjectInitializer
     
 	// Create the Blackboard Component
 	Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
+
+	SightInitialization();
 }
 
 void AEnemy_Controller::OnPossess(APawn* InPawn)
@@ -22,4 +27,37 @@ void AEnemy_Controller::OnPossess(APawn* InPawn)
 	{
 		RunBehaviorTree(BehaviourTree);
 	}
+}
+
+void AEnemy_Controller::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
+{
+	// Check if the sensed actor is the player
+	if (Actor->ActorHasTag("Player") || Actor->IsA(APawn::StaticClass()))
+	{
+		// Update Blackboard keys based on whether we see them or lost them
+		GetBlackboard()->SetValueAsBool(EnemyKeys::CanSeePlayer, Stimulus.WasSuccessfullySensed());
+	}
+}
+
+void AEnemy_Controller::SightInitialization()
+{
+	// Create Perception Component
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComp"));
+
+	// Create and Configure Sight
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
+	SightConfig->SightRadius = 2000.f;
+	SightConfig->LoseSightRadius = 2500.f;
+	SightConfig->PeripheralVisionAngleDegrees = 45.f;
+    
+	// Detection by affiliation: Ensure Neutrals is true for the Player
+	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+	AIPerceptionComponent->ConfigureSense(*SightConfig);
+	AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
+
+	// Bind the event
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy_Controller::OnTargetDetected);
 }

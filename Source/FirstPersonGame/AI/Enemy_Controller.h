@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "Enemy_Controller.generated.h"
 
 /**
@@ -11,6 +12,8 @@
  */
 class UBehaviorTreeComponent;
 class UBehaviorTree;
+class UAIPerceptionComponent;
+class UAISenseConfig_Sight;
 
 UCLASS()
 class FIRSTPERSONGAME_API AEnemy_Controller : public AAIController
@@ -33,4 +36,16 @@ public:
 	// The Behavior Tree asset to use
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	TObjectPtr<UBehaviorTree> BehaviourTree;
+
+	// Sight configuration
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TObjectPtr<UAISenseConfig_Sight> SightConfig;
+
+	UFUNCTION()
+	void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
+
+	void SightInitialization();
 };

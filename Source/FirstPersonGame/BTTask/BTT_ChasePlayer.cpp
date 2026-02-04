@@ -21,8 +21,17 @@ EBTNodeResult::Type UBTT_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	// Get Navigation System
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld());
 
+	UBlackboardComponent* const BlackboardComp = OwnerComp.GetBlackboardComponent();
+
 	if (AIController && NavSystem)
 	{
+		bool bCanSeePlayer = BlackboardComp->GetValueAsBool(EnemyKeys::CanSeePlayer);
+		if (!bCanSeePlayer)
+		{
+			// If we can't see the player, fail the task
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			return EBTNodeResult::Failed;
+		}
 		FVector Location = AIController->GetBlackboardComponent()->GetValueAsVector(EnemyKeys::PlayerPos);
 
 		AIController->MoveToLocation(Location);
