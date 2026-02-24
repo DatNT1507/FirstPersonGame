@@ -29,6 +29,7 @@ EBTNodeResult::Type UBTT_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		if (!bCanSeePlayer)
 		{
 			// If we can't see the player, fail the task
+			AIController->StopMovement();
 			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 			return EBTNodeResult::Failed;
 		}
