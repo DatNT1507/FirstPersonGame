@@ -25,5 +25,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	// The handle that tracks our 2-second timer
+	FTimerHandle JumpTimerHandle;
 
+	// The function that the timer will call
+	void PerformJump();
+
+	// How often the enemy should jump (in seconds)
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float JumpInterval = 2.0f;
 };
