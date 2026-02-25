@@ -7,8 +7,10 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "AI/EnemyKeys.h"
+#include "../Components/AdvancedPathFollowingComponent.h"
 
-AEnemy_Controller::AEnemy_Controller(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
+AEnemy_Controller::AEnemy_Controller(FObjectInitializer const& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UAdvancedPathFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	// Create the Behavior Tree Component
 	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));

@@ -9,9 +9,37 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EMovementStyle : uint8
+{
+	Normal      UMETA(DisplayName = "Normal Path"),
+	Zigzag      UMETA(DisplayName = "Zigzag Movement")
+};
+
 UCLASS()
 class FIRSTPERSONGAME_API UAdvancedPathFollowingComponent : public UPathFollowingComponent
 {
 	GENERATED_BODY()
+public:
+	UAdvancedPathFollowingComponent();
+
+	// Expose the style so we can change it dynamically
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Movement")
+	EMovementStyle CurrentMovementStyle = EMovementStyle::Normal;
+
+protected:
+	virtual void FollowPathSegment(float DeltaTime) override;
+
+private:
+	float RunningTime;
+
+	// Zigzag parameters
+	UPROPERTY(EditAnywhere, Category = "AI Movement")
+	float ZigzagFrequency = 5.0f;
 	
+	UPROPERTY(EditAnywhere, Category = "AI Movement")
+	float ZigzagIntensity = 1.0f;
+	
+	float ZigzagMovement(float DeltaTime);
 };
