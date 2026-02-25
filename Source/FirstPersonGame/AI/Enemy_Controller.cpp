@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AI/Enemy_Controller.h"
+#include "AI/Enemy.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -25,6 +26,17 @@ void AEnemy_Controller::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
+	// Cast Enemy Pawn to access its properties
+	if (AEnemy* PossessedEnemy = Cast<AEnemy>(InPawn))
+	{
+		// Get the custom PathFollowingComponent 
+		if (UAdvancedPathFollowingComponent* CustomPathComp = Cast<UAdvancedPathFollowingComponent>(GetPathFollowingComponent()))
+		{
+			// Set the movement style based on the possessed enemy's desired movement style
+			CustomPathComp->CurrentMovementStyle = PossessedEnemy->MovementStyle;
+		}
+	}
+	
 	if (BehaviourTree)
 	{
 		RunBehaviorTree(BehaviourTree);

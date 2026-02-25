@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../Components/AdvancedPathFollowingComponent.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -26,4 +27,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// The specific movement style this enemy should use when spawned
+	UPROPERTY(EditAnywhere, Category = "AI Settings")
+	EMovementStyle MovementStyle = EMovementStyle::Normal;
 };
