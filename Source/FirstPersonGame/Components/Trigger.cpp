@@ -19,8 +19,21 @@ void UTrigger::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	if (MoverActor)
+	{
+		Mover = MoverActor->FindComponentByClass<UMover>();
+		if (!Mover)
+		{
+			UE_LOG(LogTemp, Display, TEXT("Trigger is missing a reference to a Mover component!"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("Mover actor missing!"));
+	}
 	
+	OnComponentBeginOverlap.AddDynamic(this,&UTrigger::OverlapBegin);
+	OnComponentEndOverlap.AddDynamic(this,&UTrigger::OverlapEnd);
 }
 
 
@@ -30,5 +43,25 @@ void UTrigger::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UTrigger::Trigger(bool bIsOverlapping) const
+{
+	if (Mover)
+	{
+		Mover->CanMove = bIsOverlapping;
+	}
+}
+
+void UTrigger::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Trigger(true);
+}
+
+void UTrigger::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	Trigger(false);
 }
 
