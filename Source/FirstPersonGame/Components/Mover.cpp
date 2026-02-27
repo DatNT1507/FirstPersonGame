@@ -3,6 +3,8 @@
 
 #include "Components/Mover.h"
 
+#include "AITypes.h"
+
 // Sets default values for this component's properties
 UMover::UMover()
 {
@@ -19,7 +21,7 @@ void UMover::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	StartLocation = GetOwner()->GetActorLocation();
 	
 }
 
@@ -29,6 +31,29 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	MoverTick(DeltaTime);
+}
+
+void UMover::MoverTick(float DeltaTime)
+{
+	if (CanMove)
+	{
+		TargetLocation = StartLocation + MoveOffset;
+	}
+	else
+	{
+		TargetLocation = StartLocation;
+	}
+	
+	FVector CurrentLocation = GetOwner()->GetActorLocation();
+	
+	IsReachTarget = CurrentLocation.Equals(TargetLocation);
+	
+	if (!IsReachTarget)
+	{
+		float MoveSpeed = MoveOffset.Size() / MoveTime;
+		FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, MoveSpeed);
+		GetOwner()->SetActorLocation(NewLocation);
+	}
 }
 

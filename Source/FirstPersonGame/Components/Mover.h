@@ -23,6 +23,24 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	FVector MoveOffset = FVector(400.0f, 0.0f, 0.0f);
 
-		
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	float MoveTime = 3.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	bool CanMove = false;
+
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	bool IsReachTarget = false;
+
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	FVector StartLocation;
+
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	FVector TargetLocation;
+
+	void MoverTick(float DeltaTime);
 };
