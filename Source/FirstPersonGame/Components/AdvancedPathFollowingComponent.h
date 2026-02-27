@@ -42,4 +42,9 @@ private:
 	float ZigzagIntensity = 1.0f;
 	
 	float ZigzagMovement(float DeltaTime);
+
+	FVector CurrentLocation;
+	FVector CurrentTarget;
+	FVector PathDirection;
+	FVector PerpendicularDir;
 };

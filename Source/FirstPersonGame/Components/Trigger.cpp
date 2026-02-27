@@ -3,6 +3,8 @@
 
 #include "Components/Trigger.h"
 
+#include "AI/NavigationSystemBase.h"
+
 // Sets default values for this component's properties
 UTrigger::UTrigger()
 {
@@ -18,7 +20,7 @@ UTrigger::UTrigger()
 void UTrigger::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (MoverActor)
 	{
 		Mover = MoverActor->FindComponentByClass<UMover>();
@@ -49,7 +51,7 @@ void UTrigger::Trigger(bool bIsOverlapping) const
 {
 	if (Mover)
 	{
-		Mover->CanMove = bIsOverlapping;
+		Mover->setCanMove(bIsOverlapping);
 	}
 }
 

@@ -27,16 +27,16 @@ void UAdvancedPathFollowingComponent::FollowPathSegment(float DeltaTime)
 	
 	APawn* ControlledPawn = AIController->GetPawn();
 	if (!ControlledPawn) return;
-
-	// Calculate vectors for our math
-	FVector CurrentLocation = ControlledPawn->GetActorLocation();
-	FVector CurrentTarget = GetCurrentTargetLocation();
-	FVector PathDirection = (CurrentTarget - CurrentLocation).GetSafeNormal();
-	FVector PerpendicularDir = FVector::CrossProduct(FVector::UpVector, PathDirection).GetSafeNormal();
-
-	// 5. Apply Zigzag Math if the Enum is set to Zigzag
+	
+	// Apply Zigzag Math if the Enum is set to Zigzag
 	if (CurrentMovementStyle == EMovementStyle::Zigzag)
 	{
+		// Calculate vectors for our math
+		CurrentLocation = ControlledPawn->GetActorLocation();
+		CurrentTarget = GetCurrentTargetLocation();
+		PathDirection = (CurrentTarget - CurrentLocation).GetSafeNormal();
+		PerpendicularDir = FVector::CrossProduct(FVector::UpVector, PathDirection).GetSafeNormal();
+		
 		float SineValue = ZigzagMovement(DeltaTime);
 		ControlledPawn->AddMovementInput(PerpendicularDir, SineValue * ZigzagIntensity);
 	}

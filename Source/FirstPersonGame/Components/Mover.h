@@ -23,7 +23,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
+	void setCanMove(bool NewCanMove) { CanMove = NewCanMove; }
+private:
 	UPROPERTY(EditAnywhere, Category = "Mover")
 	FVector MoveOffset = FVector(400.0f, 0.0f, 0.0f);
 
