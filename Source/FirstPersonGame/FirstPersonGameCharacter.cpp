@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "FirstPersonGame.h"
+#include "Components/SpotLightComponent.h"
 
 AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 {
@@ -42,6 +43,21 @@ AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+
+	// Create the spotlight
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+    
+	// Attach spotlight to the camera 
+	Flashlight->SetupAttachment(FirstPersonCameraComponent); 
+    
+	// Set some spooky default settings
+	Flashlight->SetIntensity(5000.0f);      // Brightness
+	Flashlight->SetInnerConeAngle(15.0f);   // The bright center of the beam
+	Flashlight->SetOuterConeAngle(45.0f);   // The softer edge of the beam
+	Flashlight->SetLightColor(FLinearColor(0.8f, 0.9f, 1.0f)); // Slightly cool/blue tint
+    
+	// Start with the flashlight turned off
+	Flashlight->SetVisibility(false);
 }
 
 void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -117,4 +133,13 @@ void AFirstPersonGameCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void AFirstPersonGameCharacter::ToggleFlashlight()
+{
+	if (Flashlight)
+	{
+		// If it's visible, hide it. If it's hidden, make it visible.
+		Flashlight->SetVisibility(!Flashlight->IsVisible());
+	}
 }

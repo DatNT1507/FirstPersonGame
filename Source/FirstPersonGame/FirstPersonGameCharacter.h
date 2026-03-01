@@ -11,6 +11,7 @@ class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
+class USpotLightComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -48,7 +49,10 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
-	
+
+	// The actual flashlight component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	USpotLightComponent* Flashlight;
 public:
 	AFirstPersonGameCharacter();
 
@@ -76,6 +80,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+	// Function we can call to turn it on/off
+	UFUNCTION(BlueprintCallable, Category = "Flashlight")
+	void ToggleFlashlight();
 protected:
 
 	/** Set up input action bindings */
