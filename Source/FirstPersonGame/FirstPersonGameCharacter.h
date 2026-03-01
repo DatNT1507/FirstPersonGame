@@ -90,5 +90,8 @@ public:
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	// Tracks whether the player has picked up the maze key
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Objective")
+	bool bHasKey = false;
 };
 
