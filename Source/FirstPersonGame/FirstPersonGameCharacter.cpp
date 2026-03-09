@@ -44,20 +44,25 @@ AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
 
+	// Initialize battery state
+	MaxBattery = 10.0f;
+	CurrentBattery = MaxBattery;
+	bIsFlashlightOn = false;
+
 	// Create the spotlight
 	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
     
 	// Attach spotlight to the camera 
 	Flashlight->SetupAttachment(FirstPersonCameraComponent); 
     
-	// Set some spooky default settings
-	Flashlight->SetIntensity(5000.0f);      // Brightness
-	Flashlight->SetInnerConeAngle(15.0f);   // The bright center of the beam
-	Flashlight->SetOuterConeAngle(45.0f);   // The softer edge of the beam
-	Flashlight->SetLightColor(FLinearColor(0.8f, 0.9f, 1.0f)); // Slightly cool/blue tint
+	// Set default properties
+	Flashlight->SetInnerConeAngle(15.0f);
+	Flashlight->SetOuterConeAngle(45.0f); 
+	Flashlight->SetLightColor(FLinearColor(1.0f, 1.0f, 1.0f));
     
-	// Start with the flashlight turned off
-	Flashlight->SetVisibility(false);
+	// Start with the light ON but DIM (slightly bright)
+	Flashlight->SetIntensity(DimIntensity);
+	Flashlight->SetVisibility(true); // Make sure it's always visible now!
 }
 
 void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -137,9 +142,60 @@ void AFirstPersonGameCharacter::DoJumpEnd()
 
 void AFirstPersonGameCharacter::ToggleFlashlight()
 {
-	if (Flashlight)
+	if (!Flashlight) return;
+
+	// Turn ON: Only if it's currently off AND we have some battery left
+	if (!bIsFlashlightOn && CurrentBattery > 0.0f)
 	{
-		// If it's visible, hide it. If it's hidden, make it visible.
-		Flashlight->SetVisibility(!Flashlight->IsVisible());
+		bIsFlashlightOn = true;
+		Flashlight->SetIntensity(BrightIntensity);
+		UE_LOG(LogTemp, Warning, TEXT("Flashlight turned ON"));
+	}
+	// Turn OFF: If it's currently on, turn it off manually
+	else if (bIsFlashlightOn)
+	{
+		bIsFlashlightOn = false;
+		Flashlight->SetIntensity(DimIntensity);
+		UE_LOG(LogTemp, Warning, TEXT("Flashlight turned OFF"));
+	}
+}
+
+void AFirstPersonGameCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	BatteryTick(DeltaTime);
+}
+
+void AFirstPersonGameCharacter::BatteryTick(float DeltaTime)
+{
+	// If the flashlight is ON, drain the battery
+	if (bIsFlashlightOn)
+	{
+		CurrentBattery -= DeltaTime;
+
+		// Force it to turn OFF if the battery hits 0
+		if (CurrentBattery <= 0.0f)
+		{
+			CurrentBattery = 0.0f;
+			bIsFlashlightOn = false;
+			Flashlight->SetIntensity(DimIntensity); // Drop back to slightly bright
+            
+			UE_LOG(LogTemp, Warning, TEXT("Battery dead! Flashlight forced off."));
+		}
+	}
+	// If the flashlight is OFF, recharge the battery
+	else 
+	{
+		if (CurrentBattery < MaxBattery)
+		{
+			CurrentBattery += DeltaTime;
+            
+			// Cap it at the maximum battery (10.0f)
+			if (CurrentBattery > MaxBattery)
+			{
+				CurrentBattery = MaxBattery;
+			}
+		}
 	}
 }

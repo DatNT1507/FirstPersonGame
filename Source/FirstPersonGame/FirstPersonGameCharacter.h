@@ -83,6 +83,10 @@ protected:
 	// Function we can call to turn it on/off
 	UFUNCTION(BlueprintCallable, Category = "Flashlight")
 	void ToggleFlashlight();
+
+	virtual void Tick(float DeltaTime) override;
+
+	void BatteryTick(float DeltaTime);
 protected:
 
 	/** Set up input action bindings */
@@ -100,5 +104,25 @@ public:
 	// Tracks whether the player has picked up the maze key
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Objective")
 	bool bHasKey = false;
+
+	// Tracks if the flashlight is currently in "Bright" mode
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	bool bIsFlashlightOn;
+
+	// The current charge of the flashlight (0.0 to 10.0)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	float CurrentBattery;
+
+	// The maximum charge (10 seconds)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flashlight")
+	float MaxBattery = 10.0f;
+
+	// The brightness when turned ON
+	UPROPERTY(EditAnywhere, Category = "Flashlight")
+	float BrightIntensity = 1000.0f;
+
+	// The brightness when turned OFF (slightly bright)
+	UPROPERTY(EditAnywhere, Category = "Flashlight")
+	float DimIntensity = 200.0f;
 };
 
