@@ -104,7 +104,7 @@ public:
 	// Tracks whether the player has picked up the maze key
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Objective")
 	bool bHasKey = false;
-
+	
 	// Tracks if the flashlight is currently in "Bright" mode
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
 	bool bIsFlashlightOn;
@@ -123,6 +123,6 @@ public:
 
 	// The brightness when turned OFF (slightly bright)
 	UPROPERTY(EditAnywhere, Category = "Flashlight")
-	float DimIntensity = 200.0f;
+	float DimIntensity = 100.0f;
 };
 

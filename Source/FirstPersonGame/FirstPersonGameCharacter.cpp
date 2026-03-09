@@ -56,8 +56,8 @@ AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 	Flashlight->SetupAttachment(FirstPersonCameraComponent); 
     
 	// Set default properties
-	Flashlight->SetInnerConeAngle(15.0f);
-	Flashlight->SetOuterConeAngle(45.0f); 
+	Flashlight->SetInnerConeAngle(0.0f);
+	Flashlight->SetOuterConeAngle(90.0f); 
 	Flashlight->SetLightColor(FLinearColor(1.0f, 1.0f, 1.0f));
     
 	// Start with the light ON but DIM (slightly bright)

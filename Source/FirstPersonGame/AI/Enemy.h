@@ -7,6 +7,8 @@
 #include "../Components/AdvancedPathFollowingComponent.h"
 #include "Enemy.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class FIRSTPERSONGAME_API AEnemy : public ACharacter
 {
@@ -30,4 +32,12 @@ public:
 	// The specific movement style this enemy should use when spawned
 	UPROPERTY(EditAnywhere, Category = "AI Settings")
 	EMovementStyle MovementStyle = EMovementStyle::Normal;
+
+	// OverlapZone
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	USphereComponent* OverlapZone;
+	
+	// Restart the level if the enemy overlaps with the player
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
