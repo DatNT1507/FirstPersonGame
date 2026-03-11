@@ -5,6 +5,9 @@
 
 #include "FirstPersonGameCharacter.h"
 #include "Components/BoxComponent.h"
+#include "FirstPersonGameGameMode.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 AExitZone::AExitZone()
@@ -27,14 +30,17 @@ void AExitZone::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (AFirstPersonGameCharacter *Player = Cast<AFirstPersonGameCharacter>(OtherActor))
 	{
-		// Check if they have the key
-		if (Player->bHasKey)
+		if (AFirstPersonGameGameMode* MyGameMode = Cast<AFirstPersonGameGameMode>(UGameplayStatics::GetGameMode(this)))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AExitZone::OnOverlapBegin"))
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Find the key"))
+			// Check if they have the key
+		   if (Player->bHasKey)
+		   {
+		   		MyGameMode->HandleGameEnd(true);
+		   }
+		   else
+		   {
+			   MyGameMode->ShowNotification(TEXT("The door is locked. Find all the keys!"));
+		   }
 		}
 	}
 }

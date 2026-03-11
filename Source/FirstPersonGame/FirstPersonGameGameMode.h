@@ -38,7 +38,9 @@ public:
 	// Function to check player win or lose
 	UFUNCTION(BlueprintCallable, Category = "Game Logic")
 	void HandleGameEnd(bool bIsWin);
-	
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "UI")
+	void ShowNotification(const FString& Message);
 };
 
 
