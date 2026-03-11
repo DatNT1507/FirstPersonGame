@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "FirstPersonGameCharacter.h"
+#include "FirstPersonGameGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMazeKey::AMazeKey()
@@ -30,9 +32,13 @@ void AMazeKey::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	{
 		// Give the player the key
 		Player->bHasKey = true;
-        
-		// Print a debug message to the screen
-		UE_LOG(LogTemp, Warning, TEXT("AMazeKey::OnOverlapBegin"))
+
+
+		if (AFirstPersonGameGameMode* GameMode = Cast<AFirstPersonGameGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+		{
+			// Show a notification that they picked up the key
+			GameMode->ShowNotification(TEXT("You picked up a key! Find the exit!"));
+		}
 
 		// Destroy the key from the world
 		Destroy();
