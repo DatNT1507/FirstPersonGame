@@ -12,6 +12,19 @@ AFirstPersonGameGameMode::AFirstPersonGameGameMode()
 	bIstimerRunning = true;
 }
 
+void AFirstPersonGameGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		
+		PC->bShowMouseCursor = false;
+	}
+}
+
 void AFirstPersonGameGameMode::StopTimer()
 {
 	bIstimerRunning = false;
