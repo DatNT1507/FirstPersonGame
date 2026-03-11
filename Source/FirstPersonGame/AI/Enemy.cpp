@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "FirstPersonGameGameMode.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -47,10 +48,11 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	if (AFirstPersonGameCharacter *Player = Cast<AFirstPersonGameCharacter>(OtherActor))
 	{
-		UE_LOG(LogTemp, Log, TEXT("OnOverlapBegin"));
-		FName CurrentLevelName = FName(*GetWorld()->GetName());
-		
-		UGameplayStatics::OpenLevel(this, CurrentLevelName);
+		if (AFirstPersonGameGameMode* MyGameMode = Cast<AFirstPersonGameGameMode>(UGameplayStatics::GetGameMode(this)))
+		{
+			// Tell the GameMode the player lost!
+			MyGameMode->HandleGameEnd(false); 
+		}
 	}
 }
 

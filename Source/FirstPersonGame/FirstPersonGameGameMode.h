@@ -28,6 +28,15 @@ protected:
 
 	UFUNCTION()
 	void StopTimer();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Game Logic")
+	void OnGameEndedUI(bool bIsWin);
+
+public:
+	// Function to check player win or lose
+	UFUNCTION(BlueprintCallable, Category = "Game Logic")
+	void HandleGameEnd(bool bIsWin);
+	
 };
 
 
