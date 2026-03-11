@@ -16,6 +16,18 @@ class AFirstPersonGameGameMode : public AGameModeBase
 
 public:
 	AFirstPersonGameGameMode();
+
+protected:
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timer")
+	float ElapsedTime = 0.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "GameMode")
+	bool bIstimerRunning = false;
+
+	UFUNCTION()
+	void StopTimer();
 };
 
 
