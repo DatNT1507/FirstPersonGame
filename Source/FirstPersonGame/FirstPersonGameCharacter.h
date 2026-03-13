@@ -50,6 +50,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere, Category ="Input")
+	class UInputAction* DoSprintAction;
+
 	// The actual flashlight component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
 	USpotLightComponent* Flashlight;
@@ -84,15 +87,69 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Flashlight")
 	void ToggleFlashlight();
 
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoSprint();
+
 	virtual void Tick(float DeltaTime) override;
 
 	void BatteryTick(float DeltaTime);
 protected:
 
+	// How fast the camera bounces (matches footstep speed)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float SprintBobSpeed = 15.0f;
+
+	// How intense the bounce is (how high/low it goes)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float SprintBobAmount = 5.0f;
+
+	// Keeps track of how long we've been running to feed the Sine wave
+	float RunTime = 0.0f;
+
+	// Remembers the camera's normal Z height so we don't push it through the floor!
+	float DefaultCameraZ = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float WalkSpeed = 500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float SprintSpeed = 800.0f;
+
+	// Stamina Variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float MaxStamina = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float CurrentStamina = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float StaminaDrainRate = 20.0f; // Drains 20 per second
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float StaminaRegenRate = 15.0f; // Regens 15 per second
+
 	/** Set up input action bindings */
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	
+	// FOV Settings
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float DefaultFOV = 90.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float SprintFOV = 110.0f;
+
+	// How fast the camera zooms in and out
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float ZoomInterpSpeed = 10.0f;
+
+	// Tracks whether the camera should be zooming out
+	bool bIsSprinting = false;
+
+	// Sprint functions 
+	void StartSprint();
+	void StopSprint();
+	void SprintFixedTick(float DeltaTime);
+	
 public:
 
 	/** Returns the first person mesh **/
@@ -119,10 +176,10 @@ public:
 
 	// The brightness when turned ON
 	UPROPERTY(EditAnywhere, Category = "Flashlight")
-	float BrightIntensity = 1000.0f;
+	float BrightIntensity = 5000.0f;
 
 	// The brightness when turned OFF (slightly bright)
 	UPROPERTY(EditAnywhere, Category = "Flashlight")
-	float DimIntensity = 100.0f;
+	float DimIntensity = 500.0f;
 };
 

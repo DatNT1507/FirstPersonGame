@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "FirstPersonGame.h"
 #include "Components/SpotLightComponent.h"
+#include "Math/UnrealMathUtility.h"
 
 AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 {
@@ -63,6 +64,11 @@ AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 	// Start with the light ON but DIM (slightly bright)
 	Flashlight->SetIntensity(DimIntensity);
 	Flashlight->SetVisibility(true); // Make sure it's always visible now!
+
+	if (FirstPersonCameraComponent)
+	{
+		DefaultCameraZ = FirstPersonCameraComponent->GetRelativeLocation().Z;
+	}
 }
 
 void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,11 +86,93 @@ void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFirstPersonGameCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AFirstPersonGameCharacter::LookInput);
+
+		EnhancedInputComponent->BindAction(DoSprintAction, ETriggerEvent::Triggered, this, &AFirstPersonGameCharacter::StartSprint);
+		EnhancedInputComponent->BindAction(DoSprintAction, ETriggerEvent::Completed, this, &AFirstPersonGameCharacter::StopSprint);
 	}
 	else
 	{
 		UE_LOG(LogFirstPersonGame, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void AFirstPersonGameCharacter::StartSprint()
+{
+	if (CurrentStamina > 0.0f)
+	{
+		bIsSprinting = true;
+        
+		// Physically make the character run faster
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
+}
+
+void AFirstPersonGameCharacter::StopSprint()
+{
+	bIsSprinting = false;
+    
+	// Return the character to normal walk speed
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AFirstPersonGameCharacter::SprintFixedTick(float DeltaTime)
+{
+	if (bIsSprinting)
+    {
+        // Only drain stamina if the player is actually moving (not just holding the key against a wall)
+        if (GetVelocity().Size() > 0.0f)
+        {
+            CurrentStamina -= StaminaDrainRate * DeltaTime;
+            CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
+
+            // Force the player to stop sprinting if stamina hits 0
+            if (CurrentStamina <= 0.0f)
+            {
+                StopSprint();
+            }
+        }
+    }
+    else
+    {
+        // Regenerate stamina when not sprinting
+        if (CurrentStamina < MaxStamina)
+        {
+            CurrentStamina += StaminaRegenRate * DeltaTime;
+            CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
+        }
+    }
+	
+    if (FirstPersonCameraComponent)
+    {
+        // Smooth FOV Zoom
+        float TargetFOV = bIsSprinting ? SprintFOV : DefaultFOV;
+        float CurrentFOV = FirstPersonCameraComponent->FieldOfView;
+        float NewFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, ZoomInterpSpeed);
+        FirstPersonCameraComponent->SetFieldOfView(NewFOV);
+
+        // Procedural Head Bobbing
+        if (bIsSprinting && GetVelocity().Size() > 0.0f)
+        {
+            // Increase the wave timer
+            RunTime += DeltaTime;
+
+            // Calculate the up-and-down bounce using a Sine wave
+            float BobOffset = FMath::Sin(RunTime * SprintBobSpeed) * SprintBobAmount;
+
+            // Apply the bounce
+            FVector NewLocation = FirstPersonCameraComponent->GetRelativeLocation();
+            NewLocation.Z = DefaultCameraZ + BobOffset;
+            FirstPersonCameraComponent->SetRelativeLocation(NewLocation);
+        }
+        else
+        {
+            // Smoothly return the camera back to its normal resting height when we stop
+            RunTime = 0.0f; 
+            FVector CurrentLocation = FirstPersonCameraComponent->GetRelativeLocation();
+            CurrentLocation.Z = FMath::FInterpTo(CurrentLocation.Z, DefaultCameraZ, DeltaTime, ZoomInterpSpeed);
+            FirstPersonCameraComponent->SetRelativeLocation(CurrentLocation);
+        }
+    }
 }
 
 
@@ -160,11 +248,16 @@ void AFirstPersonGameCharacter::ToggleFlashlight()
 	}
 }
 
+void AFirstPersonGameCharacter::DoSprint()
+{
+}
+
 void AFirstPersonGameCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	BatteryTick(DeltaTime);
+	SprintFixedTick(DeltaTime);
 }
 
 void AFirstPersonGameCharacter::BatteryTick(float DeltaTime)
