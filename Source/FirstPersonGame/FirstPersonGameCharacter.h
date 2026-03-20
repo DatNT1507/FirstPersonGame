@@ -145,6 +145,8 @@ protected:
 	// Tracks whether the camera should be zooming out
 	bool bIsSprinting = false;
 
+	float FootstepTimer = 0.0f;
+
 	// Sprint functions 
 	void StartSprint();
 	void StopSprint();
@@ -181,5 +183,8 @@ public:
 	// The brightness when turned OFF (slightly bright)
 	UPROPERTY(EditAnywhere, Category = "Flashlight")
 	float DimIntensity = 500.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	class UPawnNoiseEmitterComponent* NoiseEmitter;
 };
 

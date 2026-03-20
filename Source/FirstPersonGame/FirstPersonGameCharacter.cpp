@@ -9,7 +9,11 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "FirstPersonGame.h"
+#include "AI/Enemy.h"
+#include "AI/Enemy_Controller.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Math/UnrealMathUtility.h"
 
 AFirstPersonGameCharacter::AFirstPersonGameCharacter()
@@ -65,6 +69,8 @@ AFirstPersonGameCharacter::AFirstPersonGameCharacter()
 	Flashlight->SetIntensity(DimIntensity);
 	Flashlight->SetVisibility(true); // Make sure it's always visible now!
 
+	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+	
 	if (FirstPersonCameraComponent)
 	{
 		DefaultCameraZ = FirstPersonCameraComponent->GetRelativeLocation().Z;
@@ -98,12 +104,19 @@ void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 void AFirstPersonGameCharacter::StartSprint()
 {
-	if (CurrentStamina > 0.0f)
+	if (CurrentStamina > 0.0f && GetVelocity().Size() > 0.0f)
 	{
 		bIsSprinting = true;
         
 		// Physically make the character run faster
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
+	else
+	{
+		bIsSprinting = false;
+        
+		// Physically make the character run faster
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 }
 
@@ -125,6 +138,8 @@ void AFirstPersonGameCharacter::SprintFixedTick(float DeltaTime)
             CurrentStamina -= StaminaDrainRate * DeltaTime;
             CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
 
+        	MakeNoise(1.0f, this, GetActorLocation());
+        	
             // Force the player to stop sprinting if stamina hits 0
             if (CurrentStamina <= 0.0f)
             {

@@ -45,11 +45,17 @@ void AEnemy_Controller::OnPossess(APawn* InPawn)
 
 void AEnemy_Controller::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
+	if (Actor == GetPawn()) return;
+	
 	// Check if the sensed actor is the player
 	if (Actor->ActorHasTag("Player") || Actor->IsA(APawn::StaticClass()))
 	{
 		// Update Blackboard keys based on whether we see them or lost them
 		GetBlackboard()->SetValueAsBool(EnemyKeys::CanSeePlayer, Stimulus.WasSuccessfullySensed());
+		// if (Stimulus.WasSuccessfullySensed())
+		// {
+		// 	GetBlackboard()->SetValueAsVector(EnemyKeys::PlayerPos, Stimulus.StimulusLocation);
+		// }
 	}
 }
 
@@ -62,14 +68,23 @@ void AEnemy_Controller::SightInitialization()
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = 2000.f;
 	SightConfig->LoseSightRadius = 2500.f;
-	SightConfig->PeripheralVisionAngleDegrees = 45.f;
+	SightConfig->PeripheralVisionAngleDegrees = 90.f;
     
 	// Detection by affiliation: Ensure Neutrals is true for the Player
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 
+	HearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing Config"));
+	HearingConfig->HearingRange = 3000.0f;
+
+	HearingConfig->DetectionByAffiliation.bDetectEnemies = true;
+	HearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	HearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	HearingConfig->SetMaxAge(1.0f);
+	
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
+	AIPerceptionComponent->ConfigureSense(*HearingConfig);
 	AIPerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
 	// Bind the event

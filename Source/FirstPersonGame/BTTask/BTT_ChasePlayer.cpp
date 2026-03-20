@@ -36,9 +36,9 @@ EBTNodeResult::Type UBTT_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		FVector Location = AIController->GetBlackboardComponent()->GetValueAsVector(EnemyKeys::PlayerPos);
 
 		AIController->MoveToLocation(Location);
-	}
 
-	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		return EBTNodeResult::Succeeded;
+	}
 	
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
