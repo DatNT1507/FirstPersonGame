@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../Components/AdvancedPathFollowingComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "Enemy.generated.h"
 
 class USphereComponent;
@@ -36,6 +37,13 @@ public:
 	// OverlapZone
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USphereComponent* OverlapZone;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	USpotLightComponent* AIFlashlight;
+
+	// Function to change the color dynamically
+	UFUNCTION(BlueprintCallable, Category = "Flashlight")
+	void SetFlashlightColor(FLinearColor NewColor);
 	
 	// Restart the level if the enemy overlaps with the player
 	UFUNCTION()

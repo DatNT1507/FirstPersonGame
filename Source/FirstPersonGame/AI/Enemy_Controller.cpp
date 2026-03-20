@@ -46,16 +46,28 @@ void AEnemy_Controller::OnPossess(APawn* InPawn)
 void AEnemy_Controller::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Actor == GetPawn()) return;
+
+	AEnemy* MyEnemyPawn = Cast<AEnemy>(GetPawn());
 	
 	// Check if the sensed actor is the player
 	if (Actor->ActorHasTag("Player") || Actor->IsA(APawn::StaticClass()))
 	{
 		// Update Blackboard keys based on whether we see them or lost them
 		GetBlackboard()->SetValueAsBool(EnemyKeys::CanSeePlayer, Stimulus.WasSuccessfullySensed());
-		// if (Stimulus.WasSuccessfullySensed())
-		// {
-		// 	GetBlackboard()->SetValueAsVector(EnemyKeys::PlayerPos, Stimulus.StimulusLocation);
-		// }
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			if (MyEnemyPawn)
+			{
+				MyEnemyPawn->SetFlashlightColor(FLinearColor::Red);
+			}
+		}
+		else
+		{
+			if (MyEnemyPawn)
+			{
+				MyEnemyPawn->SetFlashlightColor(FLinearColor::Green);
+			}
+		}
 	}
 }
 

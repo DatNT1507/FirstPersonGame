@@ -20,6 +20,22 @@ AEnemy::AEnemy()
 	OverlapZone->SetCollisionProfileName("Trigger");
 
 	OverlapZone->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
+
+	AIFlashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("AIFlashlight"));
+    
+	// Attach it to the Mesh. 
+	// (Optional: If you have a head socket, you can use SetupAttachment(GetMesh(), FName("head")))
+	AIFlashlight->SetupAttachment(RootComponent); 
+	AIFlashlight->SetRelativeLocation(FVector(50.0f, 0.0f, 50.0f)); // Push it slightly forward
+
+	// Set default horror lighting settings
+	AIFlashlight->SetIntensity(5000.0f);
+	AIFlashlight->SetInnerConeAngle(15.0f);
+	AIFlashlight->SetOuterConeAngle(45.0f);
+	AIFlashlight->SetAttenuationRadius(3000.0f); // How far the light reaches
+
+	// Start with Green for Patrolling
+	AIFlashlight->SetLightColor(FLinearColor::Gray);
 }
 
 // Called when the game starts or when spawned
@@ -43,8 +59,16 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::SetFlashlightColor(FLinearColor NewColor)
+{
+	if (AIFlashlight)
+	{
+		AIFlashlight->SetLightColor(NewColor);
+	}
+}
+
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (AFirstPersonGameCharacter *Player = Cast<AFirstPersonGameCharacter>(OtherActor))
 	{

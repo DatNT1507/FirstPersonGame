@@ -59,6 +59,6 @@ void AFirstPersonGameGameMode::Tick(float DeltaTime)
 	if (bIstimerRunning)
 	{
 		ElapsedTime += DeltaTime;
-		UE_LOG(LogTemp, Warning, TEXT("%f"), ElapsedTime);
+		// UE_LOG(LogTemp, Warning, TEXT("%f"), ElapsedTime);
 	}
 }

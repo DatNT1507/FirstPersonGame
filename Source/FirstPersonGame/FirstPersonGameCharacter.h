@@ -182,7 +182,7 @@ public:
 
 	// The brightness when turned OFF (slightly bright)
 	UPROPERTY(EditAnywhere, Category = "Flashlight")
-	float DimIntensity = 500.0f;
+	float DimIntensity = 2000.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class UPawnNoiseEmitterComponent* NoiseEmitter;
