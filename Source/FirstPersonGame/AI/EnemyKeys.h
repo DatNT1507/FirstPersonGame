@@ -8,4 +8,5 @@ namespace EnemyKeys
 	TCHAR const* const PlayerPos = TEXT("PlayerPos");
 	TCHAR const* const CanSeePlayer = TEXT("CanSeePlayer");
 	TCHAR const* const PatrolPos = TEXT("PatrolPos");
+	TCHAR const* const IsStunned = TEXT("IsStunned");
 }

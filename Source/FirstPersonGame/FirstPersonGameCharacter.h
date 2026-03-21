@@ -151,6 +151,9 @@ protected:
 	void StartSprint();
 	void StopSprint();
 	void SprintFixedTick(float DeltaTime);
+
+	// The function that fires the gun
+	void Shoot();
 	
 public:
 
@@ -186,5 +189,16 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class UPawnNoiseEmitterComponent* NoiseEmitter;
+
+	// Gun System
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
+	bool bHasGun = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
+	int32 CurrentAmmo = 0;
+
+	// The Input Action for clicking the mouse
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* ShootAction;
 };
 

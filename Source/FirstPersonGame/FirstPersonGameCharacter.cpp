@@ -95,6 +95,9 @@ void AFirstPersonGameCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		EnhancedInputComponent->BindAction(DoSprintAction, ETriggerEvent::Triggered, this, &AFirstPersonGameCharacter::StartSprint);
 		EnhancedInputComponent->BindAction(DoSprintAction, ETriggerEvent::Completed, this, &AFirstPersonGameCharacter::StopSprint);
+
+		// Shoot
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFirstPersonGameCharacter::Shoot);
 	}
 	else
 	{
@@ -188,6 +191,53 @@ void AFirstPersonGameCharacter::SprintFixedTick(float DeltaTime)
             FirstPersonCameraComponent->SetRelativeLocation(CurrentLocation);
         }
     }
+}
+
+void AFirstPersonGameCharacter::Shoot()
+{
+	// Check if we can shoot
+	if (!bHasGun || CurrentAmmo <= 0) 
+	{
+		// Optional: Play a "Click" empty gun sound here
+		UE_LOG(LogTemp, Warning, TEXT("No ammo!"));
+		return; 
+	}
+
+	// Consume 1 bullet
+	CurrentAmmo--;
+	UE_LOG(LogTemp, Warning, TEXT("Bang! Ammo left: %d"), CurrentAmmo);
+	// Optional: Play your gunshot sound here
+	// UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+
+	// The Hitscan (Line Trace)
+	FVector Start = FirstPersonCameraComponent->GetComponentLocation();
+	FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
+	FVector End = Start + (ForwardVector * 3000.0f); 
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // Don't shoot ourselves!
+	
+	// Fire the invisible laser
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		if (GEngine)
+		{
+			// DEBUG: Draw a RED line to the target, and a GREEN box where it hit!
+			DrawDebugLine(GetWorld(), Start, Hit.Location, FColor::Red, false, 2.0f, 0, 2.0f);
+			DrawDebugBox(GetWorld(), Hit.Location, FVector(10.0f), FQuat::Identity, FColor::Green, false, 2.0f);
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("I hit: %s"), *Hit.GetActor()->GetName()));
+		}
+		// Did we hit the AI?
+		if (AEnemy* HitEnemy = Cast<AEnemy>(Hit.GetActor()))
+		{
+			if (AEnemy_Controller* AICont = Cast<AEnemy_Controller>(HitEnemy->GetController()))
+			{
+				// Tell the AI to stun itself for 5 seconds!
+				AICont->StunAI(5.0f); 
+			}
+		}
+	}
 }
 
 

@@ -54,4 +54,7 @@ public:
 	void OnTargetDetected(AActor* Actor, FAIStimulus Stimulus);
 
 	void SightInitialization();
+
+	// Function called by the player when shot
+	void StunAI(float StunDuration);
 };

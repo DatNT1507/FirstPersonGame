@@ -102,3 +102,22 @@ void AEnemy_Controller::SightInitialization()
 	// Bind the event
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy_Controller::OnTargetDetected);
 }
+
+void AEnemy_Controller::StunAI(float StunDuration)
+{
+	if (UBlackboardComponent* BB = GetBlackboard())
+	{
+		// Tell the Blackboard we are stunned
+		BB->SetValueAsBool(EnemyKeys::IsStunned, true);
+
+		// Stop moving immediately
+		StopMovement();
+
+		// Set a timer to wake back up
+		FTimerHandle StunTimer;
+		GetWorld()->GetTimerManager().SetTimer(StunTimer, [BB]()
+		{
+			BB->SetValueAsBool(EnemyKeys::IsStunned, false);
+		}, StunDuration, false);
+	}
+}
